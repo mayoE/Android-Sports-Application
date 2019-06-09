@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserActivity">
+
+    <TextView
+        android:id="@+id/PRText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="124dp"
+        android:layout_marginTop="30dp"
+        android:text="Pick Routine"
+        android:textSize="24sp" />
+
+    <ListView
+        android:id="@+id/LV"
+        android:layout_width="277dp"
+        android:layout_height="317dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginBottom="129dp" />
+
+    <TextView
+        android:id="@+id/CRText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="83dp"
+        android:clickable="true"
+        android:onClick="Create"
+        android:text="Create Routine"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/InputName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-65dp"
+        android:ems="10"
+        android:hint="Routine Name"
+        android:inputType="textPersonName" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="180dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="173dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/IncTime"
+            android:layout_width="wrap_content"
+            android:layout_height="68dp"
+            android:background="@android:drawable/ic_media_play"
+            android:onClick="ChangeTime"
+            android:tag="1" />
+
+        <TextView
+            android:id="@+id/TimeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="   5 s"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/DecTime"
+            android:layout_width="wrap_content"
+            android:layout_height="68dp"
+            android:background="@android:drawable/ic_media_play"
+            android:onClick="ChangeTime"
+            android:tag="2" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/HelpView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/LV"
+        android:layout_marginStart="-11dp"
+        android:layout_marginTop="-14dp"
+        android:layout_toEndOf="@+id/InputName"
+        android:text="Type a name then select a time and click an item to add it to the routine." />
+
+</RelativeLayout>

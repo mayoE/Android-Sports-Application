@@ -1,0 +1,247 @@
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+
+public class UserActivity extends AppCompatActivity {
+    TextView PR;
+    TextView TT;
+    TextView CR;
+    ListView LV;
+    EditText IN;
+    TextView HP;
+    Button IT;
+    Button DT;
+    Boolean ACC = Boolean.TRUE;
+    boolean CreateDB;
+    int Time = 5;
+    ArrayList<String> List;
+    ArrayAdapter<String> adapter;
+    SharedPreferences sharedPreferences;
+    SQLiteDatabase database;
+
+
+
+    public void Create(View view){
+       if(ACC == Boolean.TRUE){
+        TT.setVisibility(View.VISIBLE);
+        IN.setVisibility(View.VISIBLE);
+        IT.setVisibility(View.VISIBLE);
+        DT.setVisibility(View.VISIBLE);
+        HP.setVisibility(View.VISIBLE);
+        PR.setVisibility(View.INVISIBLE);
+
+        for(int i=0 ; i < LV.getCount() ; i++ ){
+            List.remove(0);
+            Log.i("Logged", "Removed item " + i);
+        }
+
+           List.add("Push Ups");
+           List.add("Sit Ups");
+           List.add("Burpees");
+           List.add("Plank");
+           List.add("Pull Ups");
+           List.add("Squats");
+           List.add("Walking Lunge");
+           List.add("Backward Lunge");
+           List.add("Rollout");
+           List.add("Glute Bridge");
+           Log.i("Logged", "Added Exercises");
+
+
+        ACC = Boolean.FALSE;
+        CR.setText("Back");
+    }else {
+           TT.setVisibility(View.INVISIBLE);
+           IT.setVisibility(View.INVISIBLE);
+           DT.setVisibility(View.INVISIBLE);
+           IN.setVisibility(View.INVISIBLE);
+           HP.setVisibility(View.INVISIBLE);
+           PR.setVisibility(View.VISIBLE);
+
+           for(int i=0 ; i < LV.getCount() ; i++ ){
+               List.remove(0);
+               Log.i("Logged", "Removed item " + i);
+           }
+
+           Cursor c = database.rawQuery("SELECT rName FROM Routines", null);
+           int nameIndex = c.getColumnIndex("rName");
+           c.moveToFirst();
+
+           do {
+               List.add(c.getString(nameIndex));
+           }while (c.moveToNext());
+           Log.i("Logged", "Added Routines");
+
+           ACC = Boolean.TRUE;
+           CR.setText("Create Routine");
+       }
+    }
+
+    public void ChangeTime(View view){
+        int tagValue = Integer.parseInt(view.getTag().toString());
+        if (tagValue == 1){
+            Time += 5;
+            TT.setText("   " + Time + " s");
+        }else {
+            if (!(Time == 5)) {
+                Time -= 5;
+                TT.setText("   " + Time + " s");
+            } else {
+                Toast.makeText(this, "Can't Decrease Anymore", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_user);
+
+        PR = (TextView)findViewById(R.id.PRText);
+        CR = (TextView)findViewById(R.id.CRText);
+        TT = (TextView)findViewById(R.id.TimeText);
+        IN = (EditText)findViewById(R.id.InputName);
+        IT = (Button)findViewById(R.id.IncTime);
+        DT = (Button)findViewById(R.id.DecTime);
+        HP = (TextView)findViewById(R.id.HelpView);
+        LV = (ListView)findViewById(R.id.LV);
+        TT.setVisibility(View.INVISIBLE);
+        IT.setVisibility(View.INVISIBLE);
+        IN.setVisibility(View.INVISIBLE);
+        DT.setVisibility(View.INVISIBLE);
+        HP.setVisibility(View.INVISIBLE);
+
+
+        List = new ArrayList<>();
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, List);
+        LV.setAdapter(adapter);
+
+        sharedPreferences = getSharedPreferences("SportsApp", MODE_PRIVATE);
+
+        CreateDB = sharedPreferences.getBoolean("DB", Boolean.TRUE);
+
+
+        database = this.openOrCreateDatabase("Routines", MODE_PRIVATE, null);
+
+        if(CreateDB == Boolean.TRUE){
+            database.execSQL("CREATE TABLE IF NOT EXISTS Routines (rName VARCHAR, id INTEGER PRIMARY KEY)");
+            database.execSQL("CREATE TABLE IF NOT EXISTS Exercises (eName VARCHAR, Time INTEGER, Rid INTEGER, id INTEGER PRIMARY KEY)");
+            database.execSQL("INSERT INTO Routines (rName) VALUES ('Simple Routine')");
+            database.execSQL("INSERT INTO Routines (rName) VALUES ('Mediocre Routine')");
+            database.execSQL("INSERT INTO Routines (rName) VALUES ('Intense Routine')");
+
+            try{
+                Cursor c = database.rawQuery("SELECT id FROM Routines WHERE rName = 'Simple Routine' ", null);
+                int idIndex = c.getColumnIndex("id");
+
+                c.moveToFirst();
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Push Ups', 5, '"+Integer.parseInt(c.getString(idIndex))+"')");
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Sit Ups', 10, '"+Integer.parseInt(c.getString(idIndex))+"' )");
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Squats', 5, '"+Integer.parseInt(c.getString(idIndex))+"' )");
+                c.moveToFirst();
+
+                c = database.rawQuery("SELECT id FROM Routines WHERE rName = 'Mediocre Routine' ", null);
+                idIndex = c.getColumnIndex("id");
+                c.moveToFirst();
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Push Ups', 15, '"+Integer.parseInt(c.getString(idIndex))+"')");
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Plank', 20, '"+Integer.parseInt(c.getString(idIndex))+"' )");
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Backward Lunge', 25, '"+Integer.parseInt(c.getString(idIndex))+"' )");
+                c.moveToFirst();
+
+                c = database.rawQuery("SELECT id FROM Routines WHERE rName = 'Intense Routine' ", null);
+                idIndex = c.getColumnIndex("id");
+                c.moveToFirst();
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Push Ups', 50, '"+Integer.parseInt(c.getString(idIndex))+"')");
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Backward Lunge', 25, '"+Integer.parseInt(c.getString(idIndex))+"' )");
+                database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('Squats', 25, '"+Integer.parseInt(c.getString(idIndex))+"' )");
+                c.moveToFirst();
+            }catch(Exception e){
+                Log.i("Logged", "Failed to Insert Workout Exercises");
+            }
+
+
+            CreateDB = Boolean.FALSE;
+            sharedPreferences.edit().putBoolean("DB",  CreateDB).apply();
+            Log.i("Logged", "Database Created");
+        }
+
+
+
+        Cursor c = database.rawQuery("SELECT rName FROM Routines", null);
+        int nameIndex = c.getColumnIndex("rName");
+        c.moveToFirst();
+
+        Log.i("Logged", "Data Gathered");
+
+            do {
+                List.add(c.getString(nameIndex));
+            }while (c.moveToNext());
+        Log.i("Logged", "Data Added to List");
+
+
+
+
+        LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(ACC == Boolean.FALSE){
+                    //Make a new list
+                    Cursor c = database.rawQuery("SELECT rName FROM Routines WHERE rName = '"+ IN.getText().toString()+"' ", null);
+                    int nameIndex = c.getColumnIndex("rName");
+                    c.moveToFirst();
+                    try{
+                        Log.i("Logged", "User Exists" + c.getString(nameIndex));
+                    }catch(Exception e){
+                        database.execSQL("INSERT INTO Routines (rName) VALUES ('"+IN.getText().toString()+"')");
+                        Log.i("Logged","New Account Made");
+                    }
+
+                    try {
+                        c = database.rawQuery("SELECT id FROM Routines WHERE rName = '" + IN.getText().toString()+"' ", null);
+                        int idIndex = c.getColumnIndex("id");
+                        c.moveToFirst();
+                        database.execSQL("INSERT INTO Exercises (eName, Time, Rid) VALUES ('"+List.get(i)+"', '"+Time+"', '" + Integer.parseInt(c.getString(idIndex)) + "')");
+                        Log.i("Logged","Insert Success");
+                    }catch(Exception e){
+                        Log.i("Logged","Insert Fail");
+                    }
+
+                }else{
+                    //Open existing Account
+                    Cursor c = database.rawQuery("SELECT id FROM Routines WHERE rName = '" + List.get(i).toString() +"' ", null);
+                    int idIndex = c.getColumnIndex("id");
+                    c.moveToFirst();
+                    Log.i("Logged", c.getString(idIndex));
+                    c.moveToFirst();
+                    Log.i("Logged","Cursor Adjusted");
+                    Intent intent = new Intent(getApplicationContext(), TimerActivity.class);
+                    intent.putExtra("ID", c.getString(idIndex));
+                    startActivity(intent);
+                }
+            }
+        });
+
+
+
+
+        IT.animate().rotation(-90);
+        DT.animate().rotation(90);
+    }
+}
